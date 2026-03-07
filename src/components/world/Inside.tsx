@@ -5,8 +5,16 @@ interface InsideProps {
   avatarX: number
 }
 
+const SKY_CLASS: Record<string, string> = {
+  morning: 'sky-morning',
+  day: 'sky-day',
+  evening: 'sky-evening',
+  night: 'sky-night',
+}
+
 export const Inside = component$<InsideProps>(({ timeOfDay, avatarX }) => {
   const ambientLight = timeOfDay === 'night' ? '0.85' : '1'
+  const skyClass = SKY_CLASS[timeOfDay] ?? 'sky-day'
 
   return (
     <>
@@ -119,6 +127,28 @@ export const Inside = component$<InsideProps>(({ timeOfDay, avatarX }) => {
         {[30, 48, 66, 84, 102, 120].map((t) => (
           <div key={t} class="absolute bg-[#c0b8b0]/60" style={{ top: `${t}px`, left: '12px', right: '12px', height: '1px' }} />
         ))}
+      </div>
+
+      {/* ── INTERIOR WINDOW (x=2500) ── */}
+      <div
+        class="absolute hotspot window-glow"
+        style={{ left: '2500px', top: '22%', width: '160px', height: '120px', overflow: 'hidden', background: '#302820', border: '4px solid #484038' }}
+        data-zone="window"
+      >
+        {/* Sky background behind window */}
+        <div class={`absolute inset-0 ${skyClass} transition-colors duration-[2000ms]`} />
+
+        {/* Window tint / reflection based on time of day */}
+        <div class="absolute inset-0" style={{
+          background: timeOfDay === 'night' ? 'rgba(180,160,80,0.15)' : 'rgba(200,216,228,0.3)',
+        }} />
+
+        {/* Window mullions (crossbars) */}
+        <div class="absolute bg-[#302820]" style={{ left: '50%', top: 0, width: '4px', height: '100%', transform: 'translateX(-50%)' }} />
+        <div class="absolute bg-[#302820]" style={{ left: 0, top: '50%', width: '100%', height: '4px', transform: 'translateY(-50%)' }} />
+
+        {/* Nighttime room reflection */}
+        {timeOfDay === 'night' && <div class="absolute inset-0 bg-[#c8a840]/10" />}
       </div>
 
       {/* ── DESK zone (x=2920) ── */}
@@ -250,6 +280,23 @@ export const Inside = component$<InsideProps>(({ timeOfDay, avatarX }) => {
       <div
         class="absolute lab-wall"
         style={{ left: '5150px', top: '8%', width: '50px', height: '62%' }}
+        aria-hidden="true"
+      />
+
+      {/* ── AMBIENT LIGHTING OVERLAY ── */}
+      {/* Tints the entire room based on time of day for mood */}
+      <div
+        class="absolute pointer-events-none transition-colors duration-[2000ms]"
+        style={{
+          left: '2000px', top: 0, width: '3200px', height: '100%',
+          background:
+            timeOfDay === 'morning' ? 'linear-gradient(135deg, rgba(255,245,230,0.1) 0%, rgba(200,210,240,0.05) 100%)' :
+              timeOfDay === 'evening' ? 'linear-gradient(135deg, rgba(255,180,140,0.15) 0%, rgba(120,80,60,0.1) 100%)' :
+                timeOfDay === 'night' ? 'linear-gradient(180deg, rgba(10,15,30,0.4) 0%, rgba(30,25,20,0.6) 100%)' :
+                  'transparent', // day is normal
+          mixBlendMode: timeOfDay === 'night' ? 'multiply' : 'normal',
+          zIndex: 10,
+        }}
         aria-hidden="true"
       />
     </>
