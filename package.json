@@ -1,0 +1,24 @@
+{
+  "name": "lab-chukei-online",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --mode ssr",
+    "build": "qwik build",
+    "build.client": "vite build",
+    "build.preview": "vite build --mode ssr",
+    "preview": "qwik preview",
+    "start": "vite --open --mode ssr",
+    "qwik": "qwik",
+    "update-log": "node scripts/update-activity-log.mjs"
+  },
+  "devDependencies": {
+    "@builder.io/qwik": "^1.7.3",
+    "@builder.io/qwik-city": "^1.7.3",
+    "@types/node": "^20.11.30",
+    "typescript": "^5.4.3",
+    "unocss": "^0.60.4",
+    "vite": "^5.2.11"
+  }
+}

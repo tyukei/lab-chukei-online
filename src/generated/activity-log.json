@@ -1,0 +1,27 @@
+{
+  "generated": "2026-03-06T00:00:00Z",
+  "weekSignal": "still running experiments on how space carries meaning.",
+  "now": [
+    "building a walkable log site",
+    "reading about ambient interfaces",
+    "writing notes that go nowhere"
+  ],
+  "running": [
+    "lab-chukei-online v1",
+    "quiet tools collection",
+    "a fragment indexer (paused)",
+    "notes on spatial interfaces",
+    "signal routing experiments"
+  ],
+  "questions": [
+    "what if interfaces felt like places you could walk through?",
+    "how much signal can negative space carry?",
+    "when does a tool become a room?"
+  ],
+  "residue": [
+    "abandoned: a proximity sensor UI that was too clever",
+    "fragment: three paragraphs about maps as metaphors",
+    "broken: color interpolation that made everything worse",
+    "trace: the first version of this site, killed at 40%"
+  ]
+}
