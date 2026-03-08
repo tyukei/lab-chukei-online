@@ -57,6 +57,11 @@ export default defineConfig({
           animation: leg-r 0.38s ease-in-out infinite;
         }
 
+        @keyframes flame-flicker {
+          0%   { transform: translateX(-50%) scaleX(1)    scaleY(1);    opacity: 1; }
+          100% { transform: translateX(-50%) scaleX(0.85) scaleY(1.15); opacity: 0.9; }
+        }
+
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after {
             animation-duration: 0.01ms !important;

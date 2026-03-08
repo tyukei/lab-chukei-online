@@ -2,6 +2,7 @@ import { component$, useStore, useVisibleTask$, useTask$ } from '@builder.io/qwi
 import { Outside } from './Outside'
 import { Inside } from './Inside'
 import { Avatar } from './Avatar'
+import { Rocket, type RocketPhase, ROCKET_FRAMES } from './Rocket'
 import { ZonePanel } from '../panels/ZonePanel'
 import { ZONES, WORLD_WIDTH, INSIDE_START, AVATAR_SPEED, AVATAR_START_X } from '../../content/zones'
 import { SITE } from '../../content/site'
@@ -41,6 +42,12 @@ export const World = component$<WorldProps>(({ log }) => {
     doorFlash: 0,                         // 0–1 opacity
     doorPhase: 'idle' as 'idle' | 'in' | 'hold' | 'out',
     doorHoldFrames: 0,
+    // Rocket animation
+    rocketPhase: 'idle' as RocketPhase,
+    rocketFrame: 0,
+    avatarOnRocket: false,
+    rocketLaunchStartX: 0,   // screen X captured when launch begins
+    rocketLaunchStartY: 0,   // screen Y captured when launch begins
   })
 
   // Compute time of day (SSR-safe)
@@ -143,7 +150,50 @@ export const World = component$<WorldProps>(({ log }) => {
       }
 
       // Walking state
-      state.isWalking = moving
+      state.isWalking = moving && !state.avatarOnRocket
+
+      // ── Rocket phase machine ──
+      const ROCKET_TRIGGER_X = WORLD_WIDTH - 120
+
+      // Trigger boarding when avatar reaches the end
+      if (state.rocketPhase === 'idle' && state.avatarX >= ROCKET_TRIGGER_X) {
+        state.rocketPhase = 'boarding'
+        state.rocketFrame = 0
+        state.avatarOnRocket = true
+        // Capture screen position of rocket (world x=5090)
+        const rocketWorldX = WORLD_WIDTH - 110
+        state.rocketLaunchStartX = rocketWorldX - state.scrollX
+        state.rocketLaunchStartY = window.innerHeight * 0.68
+      }
+
+      // Freeze avatar during rocket sequence
+      if (state.avatarOnRocket) {
+        state.avatarX = ROCKET_TRIGGER_X
+      }
+
+      // Advance rocket phase
+      if (state.rocketPhase !== 'idle' && state.rocketPhase !== 'done') {
+        state.rocketFrame += 1
+        const maxFrames = ROCKET_FRAMES[state.rocketPhase] ?? 1
+        if (state.rocketFrame >= maxFrames) {
+          state.rocketFrame = 0
+          const order: RocketPhase[] = ['boarding', 'launch', 'orbit', 'reentry', 'landed', 'done']
+          const next = order[order.indexOf(state.rocketPhase) + 1]
+          state.rocketPhase = next ?? 'done'
+
+          // Capture launch coords when boarding → launch
+          if (state.rocketPhase === 'launch') {
+            const rocketWorldX = WORLD_WIDTH - 110
+            state.rocketLaunchStartX = rocketWorldX - state.scrollX
+            state.rocketLaunchStartY = window.innerHeight * 0.68
+          }
+
+          // Release avatar when landed phase starts (overlay still visible, world canvas shows through)
+          if (state.rocketPhase === 'landed') {
+            state.avatarOnRocket = false
+          }
+        }
+      }
 
       rafId = requestAnimationFrame(animate)
     }
@@ -195,11 +245,12 @@ export const World = component$<WorldProps>(({ log }) => {
         }}
       >
         <Outside timeOfDay={state.timeOfDay} activeZone={state.activeZone} avatarX={state.avatarX} />
-        <Inside timeOfDay={state.timeOfDay} avatarX={state.avatarX} />
+        <Inside timeOfDay={state.timeOfDay} avatarX={state.avatarX} rocketLaunched={state.avatarOnRocket} />
         <Avatar
           x={state.avatarX}
           isInside={state.isInside}
           isWalking={state.isWalking}
+          hidden={state.avatarOnRocket}
         />
 
         {/* Zone focus indicators (subtle) */}
@@ -222,6 +273,15 @@ export const World = component$<WorldProps>(({ log }) => {
           />
         ))}
       </div>
+
+      {/* Rocket cinematic overlay */}
+      <Rocket
+        phase={state.rocketPhase}
+        frame={state.rocketFrame}
+        launchStartX={state.rocketLaunchStartX}
+        launchStartY={state.rocketLaunchStartY}
+        timeOfDay={state.timeOfDay}
+      />
 
       {/* Room transition overlay: fade-in → hold → fade-out */}
       {state.doorPhase !== 'idle' && (

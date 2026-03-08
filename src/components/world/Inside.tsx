@@ -3,6 +3,7 @@ import { component$ } from '@builder.io/qwik'
 interface InsideProps {
   timeOfDay: 'morning' | 'day' | 'evening' | 'night'
   avatarX: number
+  rocketLaunched?: boolean
 }
 
 const SKY_CLASS: Record<string, string> = {
@@ -12,7 +13,7 @@ const SKY_CLASS: Record<string, string> = {
   night: 'sky-night',
 }
 
-export const Inside = component$<InsideProps>(({ timeOfDay, avatarX }) => {
+export const Inside = component$<InsideProps>(({ timeOfDay, avatarX, rocketLaunched }) => {
   const ambientLight = timeOfDay === 'night' ? '0.85' : '1'
   const skyClass = SKY_CLASS[timeOfDay] ?? 'sky-day'
 
@@ -275,6 +276,20 @@ export const Inside = component$<InsideProps>(({ timeOfDay, avatarX }) => {
         {/* Button */}
         <div class="absolute rounded-sm bg-[#804040]" style={{ bottom: '14px', left: '24px', width: '32px', height: '14px' }} />
       </div>
+
+      {/* ── ROCKET (x=5090, sits at end of room) ── */}
+      {!rocketLaunched && <>
+        {/* Body */}
+        <div class="absolute" style={{ left: '5078px', bottom: 'calc(30% + 0px)', width: '40px', height: '84px', background: '#dcd8d0', border: '2px solid #b0a898', borderRadius: '4px 4px 0 0' }} aria-hidden="true" />
+        {/* Nose cone */}
+        <div class="absolute" style={{ left: '5078px', bottom: 'calc(30% + 84px)', width: '40px', height: '48px', clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)', background: '#c84030' }} aria-hidden="true" />
+        {/* Left fin */}
+        <div class="absolute" style={{ left: '5064px', bottom: 'calc(30% + 0px)', width: 0, height: 0, borderTop: '28px solid transparent', borderRight: '14px solid #5a6070', borderBottom: '0 solid transparent' }} aria-hidden="true" />
+        {/* Right fin */}
+        <div class="absolute" style={{ left: '5118px', bottom: 'calc(30% + 0px)', width: 0, height: 0, borderTop: '28px solid transparent', borderLeft: '14px solid #5a6070', borderBottom: '0 solid transparent' }} aria-hidden="true" />
+        {/* Window */}
+        <div class="absolute rounded-full" style={{ left: '5088px', bottom: 'calc(30% + 52px)', width: '20px', height: '20px', background: '#1c2a3a', border: '2px solid #b0a898' }} aria-hidden="true" />
+      </>}
 
       {/* End wall */}
       <div

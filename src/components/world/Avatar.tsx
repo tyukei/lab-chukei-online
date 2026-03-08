@@ -4,6 +4,7 @@ interface AvatarProps {
   x: number
   isInside: boolean
   isWalking: boolean
+  hidden?: boolean
 }
 
 // Layout: 20px wide × 48px tall
@@ -12,7 +13,7 @@ interface AvatarProps {
 //   leg-l:     8×14 rect   (top 36px, left 1px)
 //   leg-r:     8×14 rect   (top 36px, left 11px)
 
-export const Avatar = component$<AvatarProps>(({ x, isInside, isWalking }) => {
+export const Avatar = component$<AvatarProps>(({ x, isInside, isWalking, hidden }) => {
   const color = isInside ? '#504840' : '#38342e'
 
   return (
@@ -26,6 +27,8 @@ export const Avatar = component$<AvatarProps>(({ x, isInside, isWalking }) => {
         height: '50px',
         zIndex: 20,
         willChange: 'left',
+        opacity: hidden ? 0 : 1,
+        transition: hidden ? 'opacity 0.3s ease' : 'none',
       }}
       aria-hidden="true"
     >
